@@ -12,46 +12,6 @@ import matplotlib.animation as animation
 
 from PIL import Image,ImageTk
 
-def check_valid_samples(img, f):
-    """Check whether given 
-
-    Args:
-        img (np.array): array containing all samples of training/test images.
-        f (np.array): array containing control forces corresponding to each sample.
-
-    Raises:
-        ValueError: Image dimensions not square.
-        ValueError: Image dimensions not equal to the assigned value.
-        ValueError: Sample sizes in image and forces do not match.
-        ValueError: Force vector dimension is not assigned value.
-
-    Returns:
-        int: Returns value of error. Returns 0 if no error present.
-    """
-    k,m,n = img.shape
-    o,p = f.shape
-    
-    error = 0
-    # Image sizes should be square and consistent
-    if m != n:
-        error = 1
-        raise ValueError("Image dimensions not square, currently {}x{}".format(m,n))
-    elif m != IMG_DIM:
-        error = 2
-        raise ValueError("Image dimensions not equal to the assigned value, currently {}".format(m))
-    
-    # Sample length should match for both image and forces
-    if k != o:
-        error = 3
-        raise ValueError("Sample sizes in image and forces do not match. Currently {} and {}.".format(k,o))
-    
-    # Value of p should be 6 - the number of control inputs
-    if p != NUM_CONTROL_INPUTS:
-        error = 4
-        raise ValueError("Force vector dimension is not {}. Currently {}.".format(NUM_CONTROL_INPUTS,p))
-    
-    return error
-
 def play_video(img):
     """Play video
 

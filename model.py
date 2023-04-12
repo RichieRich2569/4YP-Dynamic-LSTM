@@ -10,7 +10,6 @@ from torch.optim import Adam
 from ConvLSTM import ConvLSTM
 from ConvLSTM import Model
 from torch.utils.data import DataLoader
-#from torch.utils.tensorboard import SummaryWriter
 
 from constants import *
 
@@ -57,20 +56,7 @@ def train_model(model,optim,criterion,train_loader,num_epochs=60,val_loader=None
         first_epoch = epochs[-1]
         epoch = first_epoch+1
         
-    
-    # Initialize SummaryWriter
-    #writer = SummaryWriter(log_dir='logs')
-    # X = {}
-    # Y = {}
-    # for i, (x,y) in enumerate(train_loader):
-    #     X[i] = x
-    #     Y[i] = y
-    #force = X[24]
-    #img = Y[24]
-    # Send data to GPU (or available device)
-    #force = force.to(device)
-    #img = img.to(device)
-    #for epoch in range(1, num_epochs+1):
+        
     torch.backends.cudnn.benchmark = True
     while not stop_loop and epoch-first_epoch <= num_epochs:
         if epoch % DISPLAY_LOSS_EVERY == 0 or epoch in [1,2,3,4,5]:          
@@ -81,12 +67,7 @@ def train_model(model,optim,criterion,train_loader,num_epochs=60,val_loader=None
         # Initial hidden state for ConvLSTM - Update if ConvLSTM changed
         hidden = model.init_states(N=NUM_INDEPENDENT_CLIPS)
         hidden_states = [(None,hidden)]
-        #forces = []
         for i, (force, img) in enumerate(train_loader):
-            # -- DEBUG --
-            #if i >= 3000/NUM_FRAMES_PER_BATCH:
-            #    break
-            #-- END OF DEBUG --
             force = force.to(device)
             img = img.to(device)
             
@@ -94,7 +75,6 @@ def train_model(model,optim,criterion,train_loader,num_epochs=60,val_loader=None
                                                                                               
             output, new_hidden = model(force, hidden, return_hidden=True)
             hidden_states.append((hidden,new_hidden))
-            #forces.append(force)
             
             while len(hidden_states) > BPTT_K2:
                 del hidden_states[0]
@@ -107,29 +87,17 @@ def train_model(model,optim,criterion,train_loader,num_epochs=60,val_loader=None
                 if epoch % DISPLAY_LOSS_EVERY == 0 or epoch in [1,2,3,4,5]:
                     train_loss += loss.item()
                 
-                # Write loss to TensorBoard
-                #writer.add_scalar('Loss/train', loss.item(), i)
-                
-                # -- DEBUG --
-                # -- END OF DEBUG --
                 for j in range(BPTT_K2-1):
                     if hidden_states[-j-2][0] is None:
                         break
                     for k in range(3):
                         for l in range(2):
                             curr_grad = hidden_states[-j-1][0][k][l].grad
-                            hidden_states[-j-2][1][k][l].backward(curr_grad, retain_graph=(BPTT_K1<BPTT_K2))
-                 # Update all new_hidden values
-                # for m in range(1, len(hidden_states)):
-                #     f = forces[m-1]
-                #     h = detach_and_grad(hidden_states[m][0])
-                #     _, nh = model(f, h, return_hidden=True)
-                #     hidden_states[m] = (h,nh)       
+                            hidden_states[-j-2][1][k][l].backward(curr_grad, retain_graph=(BPTT_K1<BPTT_K2))     
         optim.step()
         
         if epoch%DISPLAY_LOSS_EVERY == 0 or epoch in [1,2,3,4,5]:
-            train_loss /= len(train_loader)*torch.numel(output)
-            #train_loss /= 3000/NUM_FRAMES_PER_BATCH*torch.numel(output)                      
+            train_loss /= len(train_loader)*torch.numel(output)                    
             loss_values.append(train_loss)
             epochs.append(epoch)
             
@@ -146,8 +114,6 @@ def train_model(model,optim,criterion,train_loader,num_epochs=60,val_loader=None
                 print("Epoch:{} Training Avg Loss:{:.5f}\n".format(
                       epoch, train_loss))
         epoch+=1
-    # Close the SummaryWriter
-    #writer.close()
 
     if VALIDATION:
         util.plot_loss(val_loss_values, epochs)
@@ -209,15 +175,6 @@ def load_model(path):
     model.load_state_dict(torch.load(path))
     model.eval()
     return model, optim, criterion
-
-def check_loss(model, criterion, loader):
-    loss_value = 0
-    for batch_num, (force, img) in enumerate(loader, 1):  
-            output = model(force)[0][0]                                
-            loss = criterion(output, img)
-            loss.backward()                                                                                      
-            loss_value += loss.item()
-    return loss_value
 
 def get_output(model, x):
     out_list = []

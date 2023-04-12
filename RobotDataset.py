@@ -28,8 +28,6 @@ def collate(batch):
     x = torch.stack(x).float()
     y = torch.stack(y).float()/255
     
-    # x = x.unsqueeze(0)
-    # y = y.unsqueeze(0)
     x = x.reshape(x.shape[0]//NUM_INDEPENDENT_CLIPS,NUM_INDEPENDENT_CLIPS,*x.shape[1:])
     y = y.reshape(y.shape[0]//NUM_INDEPENDENT_CLIPS,NUM_INDEPENDENT_CLIPS,*y.shape[1:])
     x = x.permute(1,0,2)
@@ -55,8 +53,6 @@ def val_collate(batch):
     x = torch.stack(x).float()
     y = torch.stack(y).float()/255
     
-    # x = x.unsqueeze(0)
-    # y = y.unsqueeze(0)
     x = x.reshape(x.shape[0],1,*x.shape[1:])
     y = y.reshape(y.shape[0],1,*y.shape[1:])
     x = x.permute(1,0,2)

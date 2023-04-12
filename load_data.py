@@ -5,7 +5,6 @@ import numpy as np
 
 from constants import *
 from matplotlib import image
-from matplotlib import pyplot #REMOVE
 
 def load_img(path, frames, img_pref='im', img_type='png'):
     """Load all image files from given path
@@ -48,10 +47,9 @@ def load_forces(path, frames):
     if len(f) >= frames:
         f = f[:frames]
         
-    # Extend each array into 2D arrays - IMG_DIMxIMG_DIM size
+    # Obtain input data
     new_f = []
     for i in range(0,len(f)):
-        #img = np.resize(f[i], (INPUT_DIM,INPUT_DIM))
         new_f.append(f[i])
     f = np.array(new_f)
     
