@@ -7,7 +7,6 @@ import util
 import time
 import threading as th
 from torch.optim import Adam
-from ConvLSTM import ConvLSTM
 from ConvLSTM import Model
 from torch.utils.data import DataLoader
 

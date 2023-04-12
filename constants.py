@@ -1,7 +1,7 @@
 """Contains all relevant constants for training"""
 
 NUM_CONTROL_INPUTS = 6
-MAX_INPUT = 8
+MAX_INPUT = 3
 IMG_DIM = 128
 INPUT_DIM = 32
 NUM_FRAMES_PER_BATCH = 150
