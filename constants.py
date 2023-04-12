@@ -1,0 +1,15 @@
+"""Contains all relevant constants for training"""
+
+NUM_CONTROL_INPUTS = 6
+MAX_INPUT = 8
+IMG_DIM = 128
+INPUT_DIM = 32
+NUM_FRAMES_PER_BATCH = 150
+BPTT_K1 = 1
+BPTT_K2 = 2
+SAMPLING_FREQ = 30
+DISPLAY_LOSS_EVERY = 100
+NUM_INDEPENDENT_CLIPS = 4
+VALIDATION = True
+VALIDATION_ERROR = 0.015 # Acceptable error for validation
+VAE_ACTIVATE = False
