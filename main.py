@@ -30,29 +30,46 @@ def main():
     lstm_model,optim,criterion = model.load_model('dynamic-model.pth')
     lstm_model.train(False)
     
+    # Obtain output via preset input
+
+    # Create sinusoid - f
+    f = 2 # in Hz
+    t = np.linspace(0,10,10*30)
+    xsin = np.zeros((len(t),6))
+    xsin[:,0] = 0.5*(np.sin(t*2*np.pi*2)+1.5)
+    xsin[:,1] = 0.5*(np.sin(t*2*np.pi*1)+2)
+    xsin[:,2] = 0.5*(np.sin(t*2*np.pi*0.5)+5)
+    xsin[:,3] = 0.5*(np.sin(t*2*np.pi*0.7)+2)
+    xsin[:,4] = 0.5*(np.sin(t*2*np.pi*1.5)+3.2)
+    xsin[:,5] = 0.5*(np.sin(t*2*np.pi*1)+1)
+    x = torch.cat((torch.zeros(1,120,6),torch.Tensor(xsin).unsqueeze(0)),axis=1).to(device)
+    out = model.get_output(lstm_model, x)
+    
     # Obtain output via optimisation
     
     # Open image
-    y1 = Image.open('optimisation_img/im2.png').convert('L')
-    y1 = torch.from_numpy(np.array(y1)/255).to(device)
-    y2 = Image.open('optimisation_img/im1.png').convert('L')
-    y2 = torch.from_numpy(np.array(y2)/255).to(device)
+    # y1 = Image.open('optimisation_img/im2.png').convert('L')
+    # y1 = torch.from_numpy(np.array(y1)/255).to(device)
+    # y2 = Image.open('optimisation_img/im1.png').convert('L')
+    # y2 = torch.from_numpy(np.array(y2)/255).to(device)
     
-    # Parameter definition and optimisation
-    T = 5 # 2 Seconds maximum time
-    t = [1,2,4,5]
-    y_des = [y1,y1,y2,y2]
-    param = optimiser.optimise_inputs(lstm_model, y_des, t, T)
+    # # Parameter definition and optimisation
+    # T = 5 # 2 Seconds maximum time
+    # t = [1,2,4,5]
+    # y_des = [y1,y1,y2,y2]
+    # param = optimiser.optimise_inputs(lstm_model, y_des, t, T)
     
-    # Obtain X from optimised parameters, show output
-    N = int(SAMPLING_FREQ*T)
-    n = (SAMPLING_FREQ*torch.tensor(t)).type(torch.int)
-    x = np.reshape(param, (len(n),6))
-    X = optimiser.piecewise_generator(x, n, N)
-    out = model.get_output(lstm_model, X)
+    # # Obtain X from optimised parameters, show output
+    # N = int(SAMPLING_FREQ*T)
+    # n = (SAMPLING_FREQ*torch.tensor(t)).type(torch.int)
+    # x = np.reshape(param, (len(n),6))
+    # X = optimiser.piecewise_generator(x, n, N)
+    # out = model.get_output(lstm_model, X)
     
     # Play video from prediction
-    util.play_video(out[0,...])
+    #util.play_video(out[0,...])
+    util.save_video(out[0,...], 'control_data/videos/sin4.avi')
+    util.save_data(x, 'control_data/sin4.txt')
     
     return 0
     

@@ -96,7 +96,7 @@ def save_data(x, file_name):
     x = x.detach()
     if isinstance(x,torch.Tensor):
         # Convert tensor (in LSTM form) into numpy array
-        x = x.squeeze(1).cpu().numpy()
+        x = x.squeeze(0).cpu().numpy()
     
     np.savetxt(file_name, x)
 
