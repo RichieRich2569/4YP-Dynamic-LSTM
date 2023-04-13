@@ -115,7 +115,7 @@ def optimise_inputs(network_model, y, t, T, error=sum_squared_error):
     bounds = Bounds(np.zeros(len(t)*NUM_CONTROL_INPUTS),MAX_INPUT*np.ones(len(t)*NUM_CONTROL_INPUTS))
     
     minimizer_kwargs = {'options':{'disp':True}}
-    res = dual_annealing(calculate_error, bounds, args=(y, error, network_model, t, T), maxiter=100, minimizer_kwargs=minimizer_kwargs)
+    res = dual_annealing(calculate_error, bounds, args=(y, error, network_model, t, T), maxiter=10, minimizer_kwargs=minimizer_kwargs)
     
     x_opt = res.x
     
