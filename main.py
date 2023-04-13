@@ -33,14 +33,14 @@ def main():
     # Obtain output via preset input
 
     # Create sinusoid - f
-    f = 0.2 # in Hz
+    f = 10 # in Hz
     t = np.linspace(0,10,30*30)
     xsin = np.zeros((len(t),6))
-    xsin[:,0] = 1.5*np.random.rand(1)*(np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1.0)
-    xsin[:,1] = np.random.rand(1)*3
-    xsin[:,2] = 1.5*np.random.rand(1)*(np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1.0)
+    xsin[:,0] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
+    xsin[:,1] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
+    xsin[:,2] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
     xsin[:,3] = np.random.rand(1)*3
-    xsin[:,4] = 1.5*np.random.rand(1)*(np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1.0)
+    xsin[:,4] = np.random.rand(1)*3
     xsin[:,5] = np.random.rand(1)*3
     
     x = torch.cat((torch.zeros(1,120,6),torch.Tensor(xsin).unsqueeze(0)),axis=1).to(device)
@@ -66,8 +66,8 @@ def main():
     
     # Play video from prediction
     #util.play_video(out[0,...])
-    util.save_video(out[0,...], 'control_data/videos/slow3.avi')
-    util.save_data(x, 'control_data/slow3.txt')
+    util.save_video(out[0,...], 'control_data/videos/circular_very_fast.avi')
+    util.save_data(x, 'control_data/circular_very_fast.txt')
     
     return 0
     
