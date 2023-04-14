@@ -33,41 +33,48 @@ def main():
     # Obtain output via preset input
 
     # Create sinusoid - f
-    f = 10 # in Hz
-    t = np.linspace(0,10,30*30)
-    xsin = np.zeros((len(t),6))
-    xsin[:,0] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
-    xsin[:,1] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
-    xsin[:,2] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
-    xsin[:,3] = np.random.rand(1)*3
-    xsin[:,4] = np.random.rand(1)*3
-    xsin[:,5] = np.random.rand(1)*3
+    # f = 10 # in Hz
+    # t = np.linspace(0,10,30*30)
+    # xsin = np.zeros((len(t),6))
+    # xsin[:,0] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
+    # xsin[:,1] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
+    # xsin[:,2] = (np.sin(t*2*np.pi*f+np.random.rand(1)*np.pi)+1)
+    # xsin[:,3] = np.random.rand(1)*3
+    # xsin[:,4] = np.random.rand(1)*3
+    # xsin[:,5] = np.random.rand(1)*3
     
-    x = torch.cat((torch.zeros(1,120,6),torch.Tensor(xsin).unsqueeze(0)),axis=1).to(device)
-    out = model.get_output(lstm_model, x)
+    # x = torch.cat((torch.zeros(1,120,6),torch.Tensor(xsin).unsqueeze(0)),axis=1).to(device)
+    # out = model.get_output(lstm_model, x)
     
     # Obtain output via optimisation
     
     # Open image
-    # y1 = Image.open('optimisation_img/im1.png').convert('L')
-    # y1 = torch.from_numpy(np.array(y1)/255).to(device)
-    # # Parameter definition and optimisation
-    # T = 3 # 2 Seconds maximum time
-    # t = [2]
-    # y_des = [y1]
-    # param = optimiser.optimise_inputs(lstm_model, y_des, t, T)
+    y1 = Image.open('optimisation_img/im1.png').convert('L')
+    y1 = torch.from_numpy(np.array(y1)/255).to(device)
+    y2 = Image.open('optimisation_img/im2.png').convert('L')
+    y2 = torch.from_numpy(np.array(y2)/255).to(device)
+    y3 = Image.open('optimisation_img/im3.png').convert('L')
+    y3 = torch.from_numpy(np.array(y3)/255).to(device)
+    y4 = Image.open('optimisation_img/im4.png').convert('L')
+    y4 = torch.from_numpy(np.array(y4)/255).to(device)
+    # Parameter definition and optimisation
+    T = 7 # maximum time
+    t = [1, 2, 3, 4, 5]
+    y_des = [y2, y3, y2, y1, y4]
+    disabled_inputs = np.array([False, False, False, False, False, True])
+    param = optimiser.optimise_inputs(lstm_model, y_des, t, T, disabled_inputs=disabled_inputs)
     
-    # # Obtain X from optimised parameters, show output
-    # N = int(SAMPLING_FREQ*T)
-    # n = (SAMPLING_FREQ*torch.tensor(t)).type(torch.int)
-    # x = np.reshape(param, (len(n),6))
-    # X = optimiser.piecewise_generator(x, n, N)
-    # out = model.get_output(lstm_model, X)
+    # Obtain X from optimised parameters, show output
+    N = int(SAMPLING_FREQ*T)
+    n = (SAMPLING_FREQ*torch.tensor(t)).type(torch.int)
+    x = np.reshape(param, (len(n),6))
+    X = optimiser.piecewise_generator(x, n, N, disabled_inputs)
+    out = model.get_output(lstm_model, X)
     
     # Play video from prediction
     #util.play_video(out[0,...])
-    util.save_video(out[0,...], 'control_data/videos/circular_very_fast.avi')
-    util.save_data(x, 'control_data/circular_very_fast.txt')
+    util.save_video(out[0,...], 'control_data/videos/damaged_actuator3.avi')
+    util.save_data(X, 'control_data/damaged_actuator3.txt')
     
     return 0
     

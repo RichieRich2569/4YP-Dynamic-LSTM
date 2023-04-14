@@ -33,7 +33,7 @@ def sum_squared_error(Y,y_des,n):
     
     return error
 
-def piecewise_generator(x, n, N, concatenate_zeros=True):
+def piecewise_generator(x, n, N, disabled_inputs, concatenate_zeros=True):
     """Generate prediction with inputs x at the times given by t, linearly interpolating between each xi
 
     Args:
@@ -59,6 +59,9 @@ def piecewise_generator(x, n, N, concatenate_zeros=True):
     if concatenate_zeros:
         # Add 100 time points at the start with zero value
         X = np.concatenate((np.zeros((100,NUM_CONTROL_INPUTS)), X))
+        
+    # Disable required inputs
+    X[:,disabled_inputs] = 0
     
     # Reshape data to network input shape and convert to tensor
     X = torch.from_numpy(X).type(torch.float32).to(device)
@@ -66,7 +69,7 @@ def piecewise_generator(x, n, N, concatenate_zeros=True):
     
     return X
 
-def calculate_error(x, y_des, error, model, t, T, generator=piecewise_generator):
+def calculate_error(x, y_des, error, model, t, T, disabled_inputs, generator=piecewise_generator):
     """Take parameters from optimiser and return error between prediction and desired output
 
     Args:
@@ -89,7 +92,7 @@ def calculate_error(x, y_des, error, model, t, T, generator=piecewise_generator)
     x = np.reshape(x, (len(n),6))
     
     # Get interpolated data
-    X = generator(x, n, N)
+    X = generator(x, n, N, disabled_inputs)
     
     y = get_output(model, X)
     
@@ -99,7 +102,7 @@ def calculate_error(x, y_des, error, model, t, T, generator=piecewise_generator)
     return e
     
 
-def optimise_inputs(network_model, y, t, T, error=sum_squared_error):
+def optimise_inputs(network_model, y, t, T, disabled_inputs=np.array([False, False, False, False, False, False]), error=sum_squared_error):
     """Optimise inputs in LSTM model to match output
 
     Args:
@@ -115,7 +118,7 @@ def optimise_inputs(network_model, y, t, T, error=sum_squared_error):
     bounds = Bounds(np.zeros(len(t)*NUM_CONTROL_INPUTS),MAX_INPUT*np.ones(len(t)*NUM_CONTROL_INPUTS))
     
     minimizer_kwargs = {'options':{'disp':True}}
-    res = dual_annealing(calculate_error, bounds, args=(y, error, network_model, t, T), maxiter=10, minimizer_kwargs=minimizer_kwargs)
+    res = dual_annealing(calculate_error, bounds, args=(y, error, network_model, t, T, disabled_inputs), maxiter=50, initial_temp=8000, minimizer_kwargs=minimizer_kwargs)
     
     x_opt = res.x
     
