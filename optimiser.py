@@ -75,6 +75,9 @@ def piecewise_generator(x, n, N, disabled_inputs=np.array([False, False, False, 
         else:
             X[n[i-1]:ni+1,:] = np.linspace(x0, x[i,:], ni+1-n[i-1])
         x0 = X[ni,:]
+    # -- REMOVE (NOISE FOR TESTS) --
+    X = X + np.random.randn(*X.shape)*0.5
+    # ------------------------------
     if ni < N:
         # Steady state at the end
         X[ni:N+1,:] = np.linspace(x0, x0, N+1-ni)
