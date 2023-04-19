@@ -49,7 +49,7 @@ def main():
     # Obtain output via optimisation
     
     # Open obstacle
-    # obs = Image.open('optimisation_img/obstacle3.png').convert('L')
+    # obs = Image.open('optimisation_img/obstacle5-2.png').convert('L')
     # obs = torch.from_numpy(np.array(obs)/255).to(device)
     # obs[obs>=0.1] = 1
     # obs[obs<0.1] = 0
@@ -58,20 +58,12 @@ def main():
     
     
     # Open image
-    y1 = Image.open('optimisation_img/tip1.png').convert('L')
+    y1 = Image.open('optimisation_img/im4.png').convert('L')
     y1 = torch.from_numpy(np.array(y1)/255).to(device)
-    y2 = Image.open('optimisation_img/tip2.png').convert('L')
-    y2 = torch.from_numpy(np.array(y2)/255).to(device)
-    y3 = Image.open('optimisation_img/tip3.png').convert('L')
-    y3 = torch.from_numpy(np.array(y3)/255).to(device)
-    y4 = Image.open('optimisation_img/tip4.png').convert('L')
-    y4 = torch.from_numpy(np.array(y4)/255).to(device)
-    y5 = Image.open('optimisation_img/tip5.png').convert('L')
-    y5 = torch.from_numpy(np.array(y5)/255).to(device)
     # Parameter definition and optimisation
     T = 5 # maximum time
-    t = [1.0,1.5,2.0,2.5,3.0]
-    y_des = [y1,y2,y3,y4,y5]
+    t = [2.0]
+    y_des = [y1]
     param = optimiser.optimise_inputs(lstm_model, y_des, t, T, obstacle=obs)
 
     # Obtain X from optimised parameters, show output
@@ -79,13 +71,15 @@ def main():
     n = (SAMPLING_FREQ*torch.tensor(t)).type(torch.int)
     x = np.reshape(param, (len(n),6))
     X = optimiser.piecewise_generator(x, n, N)
+    
+    # Repeat X over and over
     out = model.get_output(lstm_model, X)
     
     # Play video from prediction
     #out[:,:,:,obs==1]=0
     #util.play_video(out[0,...])
-    util.save_video(out[0,...], 'control_data/videos/paint4.avi')
-    util.save_data(X, 'control_data/paint4.txt')
+    util.save_video(out[0,...], 'control_data/videos/noise4.avi')
+    util.save_data(X, 'control_data/noise4.txt')
     
     return 0
     
